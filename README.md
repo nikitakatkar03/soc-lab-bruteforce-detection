@@ -1,62 +1,69 @@
-
-Mini SOC Lab project to simulate and detect brute force attacks using Kali Linux
 # 🔐 Mini SOC Lab: Brute Force Attack Detection
 
-## 📌 Project Overview
-This project demonstrates how a brute-force attack can be simulated and detected using Kali Linux tools and system log analysis.
+## ⚙️ Steps Performed (Final – Tested & Working)
 
 ---
 
-## 🎯 Objective
-- Simulate a brute-force attack using Hydra
-- Detect the attack using system logs
-- Identify attacker IP and attack patterns
+### 1. Setup Metasploitable2 in VMware
+- Downloaded Metasploitable2
+- Extracted the zip file
+- Opened using VMware (File → Open → Metasploitable.vmx)
+- Powered on the machine
 
 ---
 
-## 🛠 Tools Used
-- Kali Linux
-- Hydra
-- SSH
-- grep
-- awk
+### 2. Login to Metasploitable
+username: msfadmin  
+password: msfadmin  
 
 ---
 
-## ⚙️ Steps Performed
+### 3. Switch to root user
+```bash
+sudo su
 
-### 1. Started SSH service on target machine
-sudo service ssh start
+4. Generate SSH keys (Fix error)
+ssh-keygen -A
+5. Start SSH service (Working method)
+/ect/init.d/ssh start
+6. Verify SSH is running
+netstat -tulnp | grep 22
+7. Get target IP
+ip a
 
-### 2. Performed brute-force attack
-hydra -l kali -P /usr/share/wordlists/rockyou.txt ssh://TARGET_IP
+Example:
+192.168.81.140
 
-### 3. Checked authentication logs
+8. Switch to Kali Linux
+9. Check connectivity
+ping -c 4 192.168.81.140
+10. Scan SSH port
+nmap -p 22 192.168.81.140
+11. Create custom password list
+echo "msfadmin" > target_pass.txt
+12. Perform brute-force attack
+hydra -l msfadmin -P target_pass.txt ssh://192.168.81.140 -t 4 -vV
+13. Check logs
 cat /var/log/auth.log
-
-### 4. Filtered failed login attempts
+14. Filter failed attempts
 grep "Failed password" /var/log/auth.log
-
-### 5. Counted total attempts
+15. Count attempts
 grep "Failed password" /var/log/auth.log | wc -l
-
-### 6. Extracted attacker IP
+16. Extract attacker IP
 grep "Failed password" /var/log/auth.log | awk '{print $11}' | sort | uniq -c
 
----
+Example Output:
+2642 192.168.81.137
 
-## 📊 Findings
-- Multiple failed login attempts detected
-- Attacker IP identified successfully
-- Clear brute-force attack pattern observed
+Findings
+Detected multiple failed login attempts
+Identified attacker IP successfully
+Observed brute-force attack pattern
+🧠 Skills Gained
+Log Analysis
+Threat Detection
+Basic SOC Operations
+Linux Command-Line
+⚠️ Disclaimer
 
----
-
-## 🧠 Skills Gained
-- Log analysis
-- Threat detection
-- Basic SOC operations
-- Linux command-line usage
-
-## ⚠️ Disclaimer
-This project was performed in a controlled lab environment for educational purposes only.
+NOTE: This project was performed in a controlled lab environment for educational purposes only.
